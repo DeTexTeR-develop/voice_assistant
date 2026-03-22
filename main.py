@@ -1,31 +1,40 @@
 import speech_recognition as sr
-import webbrowser as wb
 import pyttsx3
+import time
 
-recogniser = sr.Recognizer()
+r = sr.Recognizer()
 engine = pyttsx3.init()
 
 def speak(text):
     engine.say(text)
     engine.runAndWait()
 
-
 if __name__ == "__main__":
     speak("Aurr bhaijii kyaaa scene...")
 
-    r = sr.Recognizer()
     with sr.Microphone() as source:
-        print("Voice Assitant Working!")
-        audio = r.listen(source, timeout=2)
+        print("Voice Assistant Working!")
 
-    # recognize speech using Sphinx
-    print("recognizing")
-    try:
-        command = r.recognize_google(audio)
-        print(command)
-    except sr.UnknownValueError:
-        print("Sphinx could not understand audio")
-    except sr.RequestError as e:
-        print("Sphinx error; {0}".format(e))
+        while True:
+            try:
+                print("Listening...")
+                audio = r.listen(source, timeout=2, phrase_time_limit=5)
 
+                print("Recognizing...")
+                command = r.recognize_google(audio)
+                print("You said:", command)
 
+                # exit condition
+                if command.lower() in ["exit", "stop", "quit"]:
+                    speak("Goodbye")
+                    time.sleep(1)
+                    break
+
+            except sr.WaitTimeoutError:
+                print("No speech detected")
+            
+            except sr.UnknownValueError:
+                print("Could not understand audio")
+            
+            except sr.RequestError as e:
+                print(f"Error: {e}")
